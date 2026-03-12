@@ -43,17 +43,17 @@ builder.Services.AddProblemDetails(options =>
 // Add global exception handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-// EF Core — InMemory provider
+// EF Core — SQLite provider
 builder.Services.AddDbContext<LendingContext>(options =>
-    options.UseInMemoryDatabase("BuckeyeLending"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// Initialize on startup
+// Migrate database on startup
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<LendingContext>();
-    context.Database.EnsureCreated();
+    context.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
